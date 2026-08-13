@@ -1,0 +1,6 @@
+{
+  "mnx": "https://raw.githubusercontent.com/w3c-cg/mnx/main/docs/mnx-schema.json",
+  "publication-manifest": "https://raw.githubusercontent.com/w3c/pub-manifest/main/schema/publication.schema.json",
+  "audiobooks": "https://raw.githubusercontent.com/w3c/audiobooks/main/schema/audiobooks.schema.json",
+  "cyclonedx": "https://raw.githubusercontent.com/CycloneDX/specification/master/schema/bom-1.7.schema.json"
+}

@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Catalogue",
+  "description": "Fixture for the flat dialect: no $defs and no $ref, every object written out where it is used. Deliberately small, and deliberately shaped like the extraction schemas the walker was built for — sections at the top, objects nested inline beneath them, arrays of objects for repeating rows. Its job is the paths $ref schemas never produce: an entity id that is a property path (orders.customer), one three levels down (orders.customer.address), and one for the item type of an array (orders.lines[]).",
+  "type": "object",
+  "additionalProperties": false,
+  "x-propertyOrder": ["catalogue", "orders"],
+  "properties": {
+    "catalogue": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "A section whose every property is a scalar — the case that must stay rows and never become cards.",
+      "x-propertyOrder": ["name", "currency", "updated_at", "tags", "retired"],
+      "required": ["name", "currency"],
+      "properties": {
+        "name": { "type": "string" },
+        "currency": { "type": "string", "enum": ["GBP", "EUR", "USD"] },
+        "updated_at": { "type": "string", "format": "date-time" },
+        "tags": {
+          "type": "array",
+          "description": "An array of scalars is a row, not a card: only arrays of objects earn an entity.",
+          "items": { "type": "string" }
+        },
+        "retired": { "type": ["boolean", "null"] }
+      }
+    },
+    "orders": {
+      "type": "object",
+      "additionalProperties": false,
+      "x-propertyOrder": ["reference", "placed_at", "status", "customer", "lines"],
+      "required": ["reference", "customer", "lines"],
+      "properties": {
+        "reference": { "type": "string" },
+        "placed_at": { "type": "string", "format": "date" },
+        "status": {
+          "type": "string",
+          "enum": ["draft", "placed", "shipped", "cancelled"]
+        },
+        "customer": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Inline object one level down: an entity whose id is a property path.",
+          "x-propertyOrder": ["full_name", "email", "address"],
+          "required": ["full_name"],
+          "properties": {
+            "full_name": { "type": "string" },
+            "email": { "type": ["string", "null"], "format": "email" },
+            "address": {
+              "type": "object",
+              "additionalProperties": false,
+              "description": "Three levels down, to prove nesting does not stop at two.",
+              "x-propertyOrder": ["line_1", "city", "postcode", "country"],
+              "required": ["line_1", "postcode"],
+              "properties": {
+                "line_1": { "type": "string" },
+                "city": { "type": ["string", "null"] },
+                "postcode": { "type": "string" },
+                "country": { "type": "string", "enum": ["GB", "IE", "FR"] }
+              }
+            }
+          }
+        },
+        "lines": {
+          "type": "array",
+          "description": "Array of inline objects: the walker gives the item type its own card, at the property path plus [].",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "x-propertyOrder": ["sku", "quantity", "unit_price", "discount"],
+            "required": ["sku", "quantity"],
+            "properties": {
+              "sku": { "type": "string" },
+              "quantity": { "type": "integer", "minimum": 1 },
+              "unit_price": { "type": "number" },
+              "discount": {
+                "type": "object",
+                "additionalProperties": false,
+                "description": "An inline object inside an array item, so the path carries [] through it.",
+                "x-propertyOrder": ["kind", "amount"],
+                "required": ["kind"],
+                "properties": {
+                  "kind": { "type": "string", "enum": ["none", "percent", "fixed"] },
+                  "amount": { "type": ["number", "null"] }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

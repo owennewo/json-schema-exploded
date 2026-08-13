@@ -1,0 +1,2334 @@
+/* Palette. Light lives on :root; theme.ts stamps the *resolved* theme on
+   <html data-theme>, so dark needs one block and nothing else in this file
+   knows a raw color. New colors belong here, not inline in a rule. */
+:root {
+  /* surfaces — bg < panel, with two extra steps for panel stratification:
+     `raise` for the pinned subject header, `sunk` for wells (field drawer,
+     segmented tracks, path fields) */
+  --bg: #f7f8fa;
+  --panel: #ffffff;
+  --panel-raise: #f4f7fb;
+  --panel-sunk: #eef1f6;
+  --head: #eef1f6;
+  --head-section: #dde7f5;
+  /* a choice card: kin to a section head, cooler, never mistaken for it */
+  --head-choice: #e6e2f6;
+  --hover: #f2f5fa;
+  --border: #d8dce3;
+  /* a hairline quieter than --border, for rules *inside* a surface */
+  --rule: #e7eaf0;
+  --shadow: 0 1px 4px rgba(20, 24, 34, 0.08);
+  /* text */
+  --text: #1f2430;
+  --text-strong: #11151f;
+  --muted: #6b7385;
+  --muted-2: #949bab;
+  /* accents — blue reads as "link/selected", green as root, purple as array */
+  --accent: #3b6ecc;
+  --on-accent: #ffffff;
+  --accent-bg: #eef3fb;
+  --accent-border: #c8d8f0;
+  --accent-text: #2c5cb0;
+  --sel-bg: #dfeafc;
+  /* selection halo: a ring wide enough to survive a zoomed-out canvas */
+  --accent-halo: rgba(59, 110, 204, 0.1);
+  --accent-halo-soft: rgba(59, 110, 204, 0.06);
+  --chip-bg: #f0f2f6;
+  --root: #2b7a5e;
+  --array: #7a5bbf;
+  --array-strong: #5a4a9e;
+  --array-bg: #ece6f7;
+  --array-border: #cabfe8;
+  --edge: #a8b0c0;
+  /* every edge that is not on the path to the anchor */
+  --edge-dim: #ccd2dd;
+  /* status */
+  --ok: #1f6e4a;
+  --ok-bg: #e2f0ea;
+  /* selection echo — where the selected def is used */
+  --echo-bg: #e8f4ee;
+  --ok-border: #b7d8c8;
+  --warn: #8a6d1f;
+  --warn-bg: #faf3dd;
+  --warn-border: #e4d7a8;
+  --danger: #b0322f;
+  --danger-bg: #fbeae9;
+  --danger-border: #eac6c4;
+  /* JSON syntax — shared by the tree, raw and detail keyword views */
+  --syn-key: #1c56b0;
+  --syn-string: #2b7a5e;
+  /* teal, not the purple it used to be: type chips take their color from the
+     syntax tokens, and light --array is purple too — numbers and enums have to
+     stay tellable apart on a card */
+  --syn-number: #0f6f86;
+  --syn-const: #b0322f;
+  --syn-punct: #8a90a0;
+  --gutter: #b0b7c4;
+  --guide: #eceef2;
+  /* type chips: same hue as the JSON view gives that type, on a tint of it,
+     so a `string` is one color everywhere in the app */
+  --chip-str-fg: var(--syn-string);
+  --chip-str-bg: #e6f2ec;
+  --chip-str-border: #c2dccf;
+  --chip-num-fg: var(--syn-number);
+  --chip-num-bg: #e2f0f4;
+  --chip-num-border: #b6d8e2;
+  --chip-enum-fg: var(--array-strong);
+  --chip-enum-bg: #ece6f7;
+  --chip-enum-border: #cabfe8;
+  --chip-const-fg: var(--syn-const);
+  --chip-const-bg: #fbeae9;
+  --chip-const-border: #eac6c4;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+:root[data-theme='dark'] {
+  --bg: #101319;
+  --panel: #171b22;
+  --panel-raise: #1a1f27;
+  --panel-sunk: #131720;
+  --head: #212734;
+  --head-section: #263349;
+  --head-choice: #2b2843;
+  --hover: #1e242e;
+  --border: #2c323d;
+  --rule: #232935;
+  --shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  --text: #dbe0e9;
+  --text-strong: #e9ecf2;
+  --muted: #8a93a5;
+  --muted-2: #5f6779;
+  --accent: #6ea8fe;
+  --on-accent: #0f1420;
+  --accent-bg: #1a2740;
+  --accent-border: #35507d;
+  --accent-text: #8fb7f5;
+  --sel-bg: #23375a;
+  --accent-halo: rgba(110, 168, 254, 0.12);
+  --accent-halo-soft: rgba(110, 168, 254, 0.07);
+  --chip-bg: #222833;
+  --root: #64c19a;
+  --array: #b494f0;
+  --array-strong: #b494f0;
+  --array-bg: #2a2340;
+  --array-border: #453a66;
+  --edge: #4d5666;
+  --edge-dim: #3a4250;
+  --ok: #64c19a;
+  --ok-bg: #17322a;
+  --echo-bg: #16302a;
+  --ok-border: #2f5b4a;
+  --warn: #dfb85e;
+  --warn-bg: #332c17;
+  --warn-border: #5a4c25;
+  --danger: #f0847e;
+  --danger-bg: #3a201f;
+  --danger-border: #673836;
+  --syn-key: #9cdcfe;
+  --syn-string: #ce9178;
+  --syn-number: #b5cea8;
+  --syn-const: #569cd6;
+  --syn-punct: #7f8794;
+  --gutter: #5a6373;
+  --guide: #262b34;
+  --chip-str-fg: var(--syn-string);
+  --chip-str-bg: #251d1a;
+  --chip-str-border: #46372f;
+  --chip-num-fg: var(--syn-number);
+  --chip-num-bg: #1c2620;
+  --chip-num-border: #33422f;
+  --chip-enum-fg: var(--array);
+  --chip-enum-bg: #221d33;
+  --chip-enum-border: #3c3357;
+  --chip-const-fg: var(--syn-const);
+  --chip-const-bg: #16202c;
+  --chip-const-border: #2c3f55;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root,
+.app {
+  height: 100%;
+  margin: 0;
+}
+
+.app {
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+}
+
+.app-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.canvas-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+}
+
+/* ── shared primitives ─────────────────────────────────────────────────────
+   Rules fade at their ends rather than butting into the frame; controls are
+   outlined at 6px, surfaces at 8px; section labels are monospace smallcaps. */
+
+.rule-h {
+  height: 1px;
+  flex-shrink: 0;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--border) 32px,
+    var(--border) calc(100% - 32px),
+    transparent
+  );
+}
+
+.rule-v {
+  width: 1px;
+  height: 20px;
+  flex-shrink: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--border) 35%,
+    var(--border) 65%,
+    transparent
+  );
+}
+
+/* a fading bottom/top rule drawn inside a bar, so the bar keeps no border */
+.ruled-bottom,
+.ruled-top {
+  position: relative;
+}
+
+.ruled-bottom::after,
+.ruled-top::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--border) 40px,
+    var(--border) calc(100% - 40px),
+    transparent
+  );
+}
+
+.ruled-bottom::after {
+  bottom: 0;
+}
+
+.ruled-top::after {
+  top: 0;
+}
+
+.label {
+  font-family: ui-monospace, monospace;
+  font-size: 9.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.label-accent {
+  color: var(--accent);
+}
+
+.label-quiet {
+  color: var(--muted-2);
+  font-weight: 400;
+}
+
+.spacer {
+  flex: 1;
+  min-width: 0;
+}
+
+.count {
+  font-family: ui-monospace, monospace;
+  font-size: 10px;
+  color: var(--muted-2);
+  white-space: nowrap;
+}
+
+.dot-sep {
+  color: var(--muted-2);
+}
+
+/* outlined action — the app's one button shape */
+.ctl {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 26px;
+  padding: 0 9px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.ctl:hover {
+  color: var(--text);
+  border-color: var(--muted-2);
+}
+
+.ctl-filled {
+  background: var(--sel-bg);
+  border-color: var(--accent-border);
+  color: var(--text-strong);
+}
+
+.ctl-filled:hover {
+  color: var(--text-strong);
+  border-color: var(--accent);
+}
+
+.ctl-accent {
+  color: var(--accent);
+  border-color: var(--accent-border);
+}
+
+.ctl-accent:hover {
+  color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.ctl-sq {
+  width: 26px;
+  padding: 0;
+  justify-content: center;
+  font-size: 13px;
+}
+
+/* small outlined action inside a panel */
+.mini-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 22px;
+  padding: 0 8px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 11.5px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.mini-btn:hover {
+  color: var(--text);
+  border-color: var(--muted-2);
+}
+
+.mini-btn-link {
+  color: var(--accent-text);
+}
+
+.mini-btn-link:hover {
+  color: var(--accent-text);
+  border-color: var(--accent-border);
+  background: var(--accent-bg);
+}
+
+.mini-btn-accent {
+  color: var(--accent);
+  border-color: var(--accent-border);
+}
+
+.mini-btn-accent:hover {
+  color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.mini-btn-accent.active,
+.mini-btn-accent.active:hover {
+  color: var(--on-accent);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+/* borderless glyph action; the border appears on hover so it reads as a button */
+.icon-btn {
+  border: 1px solid transparent;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  line-height: 1;
+  color: var(--muted-2);
+  padding: 3px 4px;
+  border-radius: 4px;
+}
+
+.icon-btn:hover {
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.icon-btn-sq {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  border-color: var(--border);
+  color: var(--muted);
+}
+
+.icon-btn-sq:hover {
+  color: var(--accent);
+  border-color: var(--accent-border);
+}
+
+.kbd {
+  font-family: ui-monospace, monospace;
+  font-size: 9.5px;
+  color: var(--muted-2);
+  background: var(--panel-sunk);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 0 3px;
+  line-height: 13px;
+}
+
+/* selectable schema path */
+.path-field {
+  flex: 1;
+  min-width: 0;
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--muted);
+  background: var(--panel-sunk);
+  border: 1px solid var(--rule);
+  border-radius: 5px;
+  padding: 3px 7px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  user-select: all;
+}
+
+.path-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+/* description: quoted from the schema, so it gets a quote's left rule */
+.desc {
+  margin: 0 0 14px;
+  padding-left: 11px;
+  border-left: 2px solid var(--accent-border);
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--text);
+  white-space: pre-wrap;
+  text-wrap: pretty;
+}
+
+/* ── popovers ─────────────────────────────────────────────────────────────
+   The schema picker, the depth control and the validation scope are popovers
+   rather than native <select>s: native option lists render differently on
+   every OS and cannot carry the captions the depth concept needs. */
+
+.pop-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.pop {
+  position: absolute;
+  z-index: 40;
+  min-width: 100%;
+  background: var(--panel-raise);
+  border: 1px solid var(--accent-border);
+  border-radius: 10px;
+  box-shadow:
+    0 12px 32px rgba(0, 0, 0, 0.35),
+    0 0 0 1px var(--accent-halo-soft);
+  padding: 12px 13px 11px;
+  font-size: 12px;
+  color: var(--text);
+}
+
+.pop-down {
+  top: calc(100% + 7px);
+}
+
+.pop-up {
+  bottom: calc(100% + 7px);
+}
+
+.pop-left {
+  left: 0;
+}
+
+.pop-right {
+  right: 0;
+}
+
+.pop-head {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.pop-head-value {
+  font-family: ui-monospace, monospace;
+  font-size: 10.5px;
+  color: var(--accent);
+}
+
+.pop-note {
+  margin: 0;
+  font-size: 10.5px;
+  line-height: 1.5;
+  color: var(--muted-2);
+}
+
+.pop-note strong {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.pop-rule {
+  height: 1px;
+  margin: 11px 0 9px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--border) 20px,
+    var(--border) calc(100% - 20px),
+    transparent
+  );
+}
+
+.pop-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 200px;
+}
+
+.pop-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+  font-family: ui-monospace, monospace;
+  font-size: 11.5px;
+  color: var(--text);
+  text-align: left;
+  padding: 5px 7px;
+  border-radius: 5px;
+  white-space: nowrap;
+}
+
+.pop-item:hover {
+  background: var(--hover);
+}
+
+.pop-item.active {
+  background: var(--accent-bg);
+  color: var(--accent-text);
+}
+
+.pop-item[disabled] {
+  color: var(--muted-2);
+  cursor: default;
+}
+
+.pop-item[disabled]:hover {
+  background: none;
+}
+
+.pop-tick {
+  width: 10px;
+  color: var(--accent);
+  font-size: 10px;
+}
+
+/* grouped lists: a heading per source kind, and a second line per item */
+.pop-group {
+  padding: 8px 7px 3px;
+}
+
+.pop-group:first-child {
+  padding-top: 2px;
+}
+
+.pop-item-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.pop-item-sub {
+  font-size: 9.5px;
+  color: var(--muted-2);
+}
+
+.pop-item.active .pop-item-sub {
+  color: var(--accent-text);
+  opacity: 0.7;
+}
+
+.pop-empty,
+.pop-warn {
+  padding: 5px 7px;
+  font-size: 10.5px;
+  line-height: 1.45;
+  color: var(--muted-2);
+  max-width: 260px;
+}
+
+.pop-warn {
+  color: var(--warn);
+}
+
+.ctl-remote {
+  font-size: 9.5px;
+  color: var(--accent);
+}
+
+/* ── header ───────────────────────────────────────────────────────────────
+   Three zones — document (brand, schema), anchor (breadcrumb), view/status
+   (depth, focus, validation, theme) — separated by fading hairlines. */
+
+.app-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  height: 44px;
+  padding: 0 12px;
+  background: var(--panel);
+  font-size: 13px;
+  flex-shrink: 0;
+  z-index: 20;
+}
+
+.app-header .rule-v {
+  margin: 0 12px;
+}
+
+.hz {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.hz-anchor {
+  flex: 1;
+  min-width: 0;
+}
+
+.brand-glyph {
+  font-family: ui-monospace, monospace;
+  font-size: 13px;
+  color: var(--accent);
+}
+
+.brand-name {
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.ctl-schema .ctl-glyph {
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--accent);
+}
+
+.ctl-schema {
+  background: var(--panel-sunk);
+  color: var(--text);
+  gap: 7px;
+  padding: 0 8px;
+}
+
+.ctl-schema:hover {
+  border-color: var(--accent-border);
+}
+
+.ctl-name {
+  font-family: ui-monospace, monospace;
+  font-size: 11.5px;
+}
+
+.caret {
+  font-size: 9px;
+  color: var(--muted);
+}
+
+/* breadcrumb: a schema path, so monospace with "/" separators */
+.crumbs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  overflow: hidden;
+  font-family: ui-monospace, monospace;
+  font-size: 11.5px;
+}
+
+.crumb {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+  color: var(--muted);
+  padding: 2px 3px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+.crumb:hover {
+  color: var(--text);
+  background: var(--hover);
+}
+
+.crumb-sep {
+  color: var(--edge);
+}
+
+/* the terminal segment: the anchor everything downstream is measured from */
+.crumb-anchor {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 22px;
+  padding: 0 4px 0 7px;
+  background: var(--accent-bg);
+  border: 1px solid var(--accent-border);
+  border-radius: 6px;
+  box-shadow: 0 0 0 3px var(--accent-halo-soft);
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.crumb-anchor .anchor-glyph {
+  color: var(--accent);
+  font-size: 10px;
+}
+
+.crumb-anchor .anchor-name {
+  color: var(--text-strong);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.crumb-hint {
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--muted-2);
+}
+
+/* depth readout: one control standing in for three axes */
+.depth-readout {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: ui-monospace, monospace;
+  font-size: 11.5px;
+  color: var(--text-strong);
+}
+
+.depth-readout .axis-glyph {
+  color: var(--muted);
+}
+
+.ctl-depth .label {
+  color: var(--accent-text);
+  letter-spacing: 0.08em;
+}
+
+.ctl-depth .caret {
+  color: var(--accent-text);
+}
+
+/* wide enough that every axis caption is one line */
+.pop-depth {
+  width: 344px;
+}
+
+.depth-axis {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.depth-axis + .depth-axis {
+  margin-top: 9px;
+}
+
+.depth-axis-name {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--text);
+}
+
+/* wide enough for "{ }" — the widest of the three axis glyphs */
+.depth-axis-name .axis-glyph {
+  font-family: ui-monospace, monospace;
+  font-size: 10px;
+  color: var(--muted);
+  width: 18px;
+  white-space: nowrap;
+}
+
+.depth-axis-caption {
+  display: block;
+  font-size: 10.5px;
+  color: var(--muted-2);
+  padding-left: 23px;
+  margin-top: 1px;
+}
+
+/* the whole range is visible without opening anything further */
+.seg {
+  display: flex;
+  background: var(--panel-sunk);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.seg button {
+  width: 26px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.seg button:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.seg button.on {
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 700;
+}
+
+.seg button[disabled] {
+  color: var(--muted-2);
+  cursor: default;
+  background: none;
+}
+
+.focus-btn.active {
+  color: var(--on-accent);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.focus-btn.active .kbd {
+  color: var(--on-accent);
+  background: none;
+  border-color: var(--accent-border);
+}
+
+.v-pill {
+  font-family: ui-monospace, monospace;
+  font-size: 11.5px;
+  gap: 6px;
+}
+
+.v-pill:hover {
+  border-color: var(--danger-border);
+}
+
+.v-pill .v-err {
+  color: var(--danger);
+}
+
+.v-pill .v-wrn {
+  color: var(--warn);
+}
+
+.v-pill .v-ok {
+  color: var(--ok);
+}
+
+/* drift/parse status sits in the fixed status zone, never between the schema
+   picker and the crumbs where it would shove the breadcrumb sideways */
+.status-warn,
+.status-error {
+  font-size: 11.5px;
+  border-radius: 6px;
+  padding: 3px 8px;
+  white-space: nowrap;
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.status-warn {
+  color: var(--warn);
+  background: var(--warn-bg);
+  border: 1px solid var(--warn-border);
+  cursor: help;
+}
+
+.status-error {
+  color: var(--danger);
+  background: var(--danger-bg);
+  border: 1px solid var(--danger-border);
+}
+
+/* ── entity card ──────────────────────────────────────────────────────────
+   Dimensions must agree with NODE_WIDTH/HEADER_H/ROW_H in layout.ts */
+
+.entity {
+  width: 280px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  font-size: 12px;
+  overflow: hidden;
+}
+
+.entity-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 10px;
+  background: var(--head);
+}
+
+.entity-root .entity-header {
+  background: var(--ok-bg);
+}
+
+.entity-array .entity-header {
+  background: var(--array-bg);
+}
+
+.entity-kind {
+  font-family: ui-monospace, monospace;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.entity-root .entity-kind {
+  color: var(--root);
+}
+
+.entity-array .entity-kind {
+  color: var(--array);
+}
+
+.entity-title {
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+
+.chip,
+.row-chip {
+  font-family: ui-monospace, monospace;
+  font-size: 10px;
+  color: var(--muted);
+  background: var(--chip-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0 4px;
+  line-height: 16px;
+  white-space: nowrap;
+}
+
+/* type tones: a chip says what kind of value it is before it is read */
+.chip-str {
+  color: var(--chip-str-fg);
+  background: var(--chip-str-bg);
+  border-color: var(--chip-str-border);
+}
+
+.chip-num {
+  color: var(--chip-num-fg);
+  background: var(--chip-num-bg);
+  border-color: var(--chip-num-border);
+}
+
+.chip-enum {
+  color: var(--chip-enum-fg);
+  background: var(--chip-enum-bg);
+  border-color: var(--chip-enum-border);
+}
+
+.chip-const {
+  color: var(--chip-const-fg);
+  background: var(--chip-const-bg);
+  border-color: var(--chip-const-border);
+}
+
+.chip-null {
+  color: var(--warn);
+  background: var(--warn-bg);
+  border-color: var(--warn-border);
+}
+
+.entity-rows {
+  padding: 5px 0;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  height: 22px;
+  padding: 0 10px;
+  position: relative;
+  cursor: pointer;
+}
+
+/* object prop: the row rendering of a relationship */
+.chip-link {
+  color: var(--accent);
+  background: var(--accent-bg);
+  border-color: var(--accent-border);
+}
+
+.row-link .row-name {
+  color: var(--accent-text);
+}
+
+/* Dashed = the shape lives elsewhere. Only a $ref is marked; an inline object
+   is the assumed case and carries nothing. Same language as the ref edges,
+   and the only signal a scalar-def row has — it draws no edge at all. */
+.chip.chip-ref,
+.row-chip.chip-ref {
+  border-style: dashed;
+  border-color: var(--accent-border);
+}
+
+/* how many properties $ref this def — quieter than the type chips beside it */
+.chip-uses {
+  color: var(--muted);
+}
+
+.row:hover {
+  background: var(--hover);
+}
+
+.row-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.port {
+  width: 6px;
+  height: 6px;
+  background: var(--muted);
+  border: none;
+}
+
+/* ladder anchors and per-row anchors carry edges, but should not read as UI */
+.port-slot,
+.port-row {
+  width: 5px;
+  height: 5px;
+  background: var(--edge);
+}
+
+.port-row {
+  background: var(--accent-border);
+}
+
+/* an anchor in the pool that no edge is using right now */
+.port-idle {
+  opacity: 0;
+}
+
+/* marker defs only — the element itself must not paint or catch clicks */
+.edge-markers {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+/* relationship ends: circle = one, triangle = many. context-stroke takes the
+   colour from the edge that references the marker, so union/ref edges keep
+   their own stroke and both themes work without a second definition. */
+.marker-one {
+  fill: var(--panel);
+  stroke: context-stroke;
+  stroke-width: 1.4;
+}
+
+.marker-many {
+  fill: context-stroke;
+}
+
+/* React Flow ships its own light/dark defaults (App passes colorMode); point
+   the ones that show through at our palette so the canvas matches the panels */
+.react-flow {
+  --xy-background-color: var(--bg);
+  --xy-minimap-background-color: var(--panel);
+  --xy-minimap-node-background-color: var(--edge);
+  --xy-edge-label-background-color: var(--panel);
+}
+
+.react-flow__edge-path {
+  stroke: var(--edge);
+}
+
+/* selection: a ring plus a halo, because a 2px outline is ~1px at the zoom a
+   25-card graph actually gets viewed at */
+.entity.selected {
+  border-color: var(--accent-border);
+  box-shadow:
+    0 0 0 4px var(--accent-halo),
+    0 4px 16px rgba(0, 0, 0, 0.25);
+}
+
+.row.selected-row,
+.row.selected-row:hover {
+  background: var(--sel-bg);
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+
+.row.selected-row .row-name {
+  color: var(--text-strong);
+  font-weight: 600;
+}
+
+/* the containment path from the root to the anchor, drawn as one chain */
+.canvas-wrap.has-anchor .react-flow__edge-path {
+  stroke: var(--edge-dim);
+}
+
+.canvas-wrap .react-flow__edge.edge-chain .react-flow__edge-path {
+  stroke: var(--accent);
+  stroke-width: 2.2;
+}
+
+/* Selection echo: a definition with no card of its own lights up its use
+   sites instead. Deliberately quieter than a selection — this is "here is
+   where it is used", not "here is what you picked". */
+.row.row-echo {
+  background: var(--echo-bg);
+  box-shadow: inset 2px 0 0 var(--ok);
+}
+
+.entity.entity-echo {
+  outline: 2px solid var(--ok-border);
+  outline-offset: 1px;
+}
+
+.canvas-wrap .react-flow__edge.edge-echo .react-flow__edge-path {
+  stroke: var(--ok);
+  stroke-width: 2.2;
+}
+
+/* residue: what this card is standing in front of at the current depth */
+.chip-hidden {
+  color: var(--array-strong);
+  background: var(--array-bg);
+  border-color: var(--array-border);
+}
+
+.chip-twin {
+  color: var(--ok);
+  background: var(--ok-bg);
+  border-color: var(--ok-border);
+}
+
+/* section cards */
+.entity-section .entity-header {
+  background: var(--head-section);
+}
+
+.entity-section .entity-title {
+  font-size: 13px;
+}
+
+.copy-btn {
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0 2px;
+  font-size: 12px;
+  line-height: 1;
+  color: var(--muted);
+}
+
+.copy-btn:hover {
+  color: var(--accent);
+}
+
+/* canvas furniture sits *on* the canvas: panel surface, 8px radius, shadow */
+.react-flow__controls {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.react-flow__controls-button {
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  color: var(--muted);
+  width: 28px;
+  height: 28px;
+  font-size: 12px;
+}
+
+.react-flow__controls-button:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+/* React Flow only dims disabled *icons*; these buttons are glyphs */
+.react-flow__controls-button:disabled {
+  opacity: 0.35;
+}
+
+.react-flow__controls-button svg {
+  fill: currentColor;
+}
+
+.react-flow__minimap {
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+}
+
+/* ref edges */
+.edge-ref .react-flow__edge-path {
+  stroke-dasharray: 5 4;
+}
+
+.edge-union .react-flow__edge-path {
+  stroke-dasharray: 2 3;
+}
+
+.react-flow__edge-text {
+  font-size: 9px;
+  fill: var(--muted);
+}
+
+/* rows: required + extends */
+.req {
+  color: var(--danger);
+  margin-left: 1px;
+}
+
+.row-extends {
+  color: var(--muted);
+  font-style: italic;
+  font-size: 11px;
+}
+
+/* ── side panels (left = schema JSON, right = entity) ─────────────────────── */
+
+.side-panel {
+  height: 100%;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--panel);
+  overflow: hidden;
+}
+
+.side-left {
+  width: 320px;
+  border-right: 1px solid var(--border);
+}
+
+/* 380, not 340: the property table needs room for a monospace name, a flag
+   and a type chip without ellipsing `outstanding_balance` */
+.side-right {
+  width: 380px;
+  border-left: 1px solid var(--border);
+}
+
+.side-panel.collapsed {
+  width: 30px;
+  align-items: center;
+  padding-top: 8px;
+}
+
+.panel-tab {
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--muted);
+  font-family: ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  writing-mode: vertical-rl;
+  padding: 6px 2px;
+}
+
+.panel-tab:hover {
+  color: var(--accent);
+}
+
+.panel-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 12px;
+  flex-shrink: 0;
+  font-size: 12px;
+}
+
+.panel-title {
+  flex: 1;
+  font-family: ui-monospace, monospace;
+  font-size: 9.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+
+.panel-empty {
+  color: var(--muted-2);
+  font-size: 12px;
+  padding: 12px 14px;
+}
+
+/* left panel: folding JSON tree */
+.json-tree {
+  flex: 1;
+  overflow: auto;
+  padding: 6px 4px;
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+.jt-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding-right: 6px;
+  cursor: pointer;
+  border-radius: 3px;
+}
+
+.jt-row:hover {
+  background: var(--hover);
+}
+
+.jt-row.jt-hl {
+  background: var(--accent-bg);
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+
+.jt-leaf {
+  padding-left: 20px;
+}
+
+.jt-caret {
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+  width: 14px;
+  flex-shrink: 0;
+  font-size: 10px;
+  line-height: 1;
+  color: var(--muted);
+}
+
+.jt-caret:hover {
+  color: var(--text);
+}
+
+.jt-key {
+  color: var(--syn-key);
+}
+
+.jt-key::after {
+  content: ':';
+  color: var(--muted);
+}
+
+.jt-sum {
+  color: var(--muted);
+}
+
+/* the tree has no chip to dash, so a referenced node names its target instead */
+.jt-ref {
+  color: var(--accent-text);
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.jt-val {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 480px;
+}
+
+.jt-string {
+  color: var(--syn-string);
+}
+
+.jt-number {
+  color: var(--syn-number);
+}
+
+.jt-bool,
+.jt-null {
+  color: var(--syn-const);
+}
+
+/* left panel: tree/raw mode toggle + raw view */
+.mode-toggle {
+  display: flex;
+  background: var(--panel-sunk);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.mode-toggle button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: ui-monospace, monospace;
+  font-size: 10.5px;
+  padding: 2px 9px;
+  color: var(--muted);
+}
+
+.mode-toggle button:hover {
+  color: var(--text);
+}
+
+.mode-toggle button.active {
+  background: var(--sel-bg);
+  color: var(--text-strong);
+  font-weight: 600;
+}
+
+/* A use site names a property on a card. The owner gives way first: six uses
+   of one def on a long-named card must not ellipsise to six identical rows. */
+.use-site {
+  display: flex;
+  align-items: baseline;
+  min-width: 0;
+}
+
+.use-owner {
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.use-prop {
+  flex: 0 0 auto;
+}
+
+/* Defs tab: the navigator the tree isn't. Every $defs member, what the canvas
+   did with it, and how many places reference it — filtered by a plain
+   case-insensitive substring, because kebab-case names reward predictable. */
+.defs-pane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.defs-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.defs-filter {
+  flex: 1;
+  min-width: 0;
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--text);
+  background: var(--panel-sunk);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 3px 7px;
+}
+
+.defs-filter:focus {
+  outline: none;
+  border-color: var(--accent-border);
+  background: var(--panel);
+}
+
+.defs-filter::placeholder {
+  color: var(--muted-2);
+}
+
+.defs-list {
+  flex: 1;
+  overflow: auto;
+  padding: 4px;
+}
+
+.def-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  padding: 3px 6px;
+  border-radius: 4px;
+  color: var(--text);
+}
+
+.def-row:hover {
+  background: var(--hover);
+}
+
+.def-row.active {
+  background: var(--accent-bg);
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+
+.def-name {
+  flex: 1;
+  min-width: 0;
+  font-family: ui-monospace, monospace;
+  font-size: 11.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.def-row.active .def-name {
+  color: var(--text-strong);
+  font-weight: 600;
+}
+
+/* what the canvas did with this def */
+.def-badge {
+  font-family: ui-monospace, monospace;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted-2);
+}
+
+.def-badge.def-card {
+  color: var(--accent-text);
+}
+
+.def-uses {
+  width: 22px;
+  text-align: right;
+  font-family: ui-monospace, monospace;
+  font-size: 10px;
+  color: var(--muted);
+}
+
+/* nothing references it: dead unless something outside the document uses it */
+.def-uses.is-dead {
+  color: var(--danger);
+}
+
+/* the tree's version of the same tell */
+.jt-badge {
+  font-family: ui-monospace, monospace;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted-2);
+}
+
+/* Raw view: an editor-style listing — gutter numbers, indent guides, syntax
+   colors, and the current selection highlighted as a block of lines. Lines
+   wrap (descriptions in this schema are long and the panel is narrow), which
+   is why the indent is its own flex item: continuations hang off it. */
+.json-raw {
+  flex: 1;
+  overflow: auto;
+  margin: 0;
+  padding: 6px 0;
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  line-height: 1.55;
+  background: var(--panel);
+}
+
+.jr-line {
+  display: flex;
+  align-items: stretch;
+  cursor: pointer;
+  border-left: 2px solid transparent;
+}
+
+.jr-line:hover {
+  background: var(--hover);
+}
+
+.jr-sel,
+.jr-sel:hover {
+  background: var(--accent-bg);
+  border-left-color: var(--accent);
+}
+
+.jr-num {
+  flex: none;
+  width: 4.5ch;
+  padding-right: 1ch;
+  text-align: right;
+  color: var(--gutter);
+  user-select: none;
+  font-variant-numeric: tabular-nums;
+}
+
+/* one guide per indent level, drawn on the right edge of each 2ch cell; the
+   content box starts one level in so column 0 never gets a rule */
+.jr-ind {
+  flex: none;
+  padding-left: 2ch;
+  background-image: repeating-linear-gradient(
+    to right,
+    var(--guide) 0 1px,
+    transparent 1px 2ch
+  );
+  background-origin: content-box;
+  background-clip: content-box;
+}
+
+.jr-code {
+  flex: 1;
+  min-width: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  padding-right: 8px;
+}
+
+.jr-key {
+  color: var(--syn-key);
+}
+
+.jr-string {
+  color: var(--syn-string);
+}
+
+.jr-number {
+  color: var(--syn-number);
+}
+
+.jr-bool,
+.jr-null {
+  color: var(--syn-const);
+}
+
+.jr-punct {
+  color: var(--syn-punct);
+}
+
+/* ── right panel: subject header / body / field drawer ─────────────────────
+   Three fixed regions, not one scroll: inspecting a field must not scroll the
+   entity context off the top. */
+
+.subject {
+  flex-shrink: 0;
+  padding: 13px 14px 12px;
+  background: var(--panel-raise);
+}
+
+.subject-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.subject-head h2 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: var(--text-strong);
+}
+
+.subject-glyph {
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.subject-glyph.is-array {
+  color: var(--array);
+}
+
+.subject-glyph.is-root {
+  color: var(--root);
+}
+
+.subject-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 9px;
+}
+
+.detail-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 12px 14px 16px;
+  font-size: 13px;
+}
+
+.table-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0 0 7px;
+}
+
+/* the property table: three aligned columns, so it scans as a table */
+.prop-table {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.prop-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  border: none;
+  border-top: 1px solid var(--rule);
+  background: none;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  padding: 5px 9px;
+}
+
+.prop-row:first-child {
+  border-top: none;
+}
+
+.prop-row:hover {
+  background: var(--hover);
+}
+
+.prop-row.active,
+.prop-row.active:hover {
+  background: var(--accent-bg);
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+
+.prop-name {
+  font-family: ui-monospace, monospace;
+  font-size: 11.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.prop-row.active .prop-name {
+  color: var(--text-strong);
+  font-weight: 600;
+}
+
+.prop-link .prop-name {
+  color: var(--accent-text);
+}
+
+/* flags are words, not 4px of punctuation — "which of these are required" is
+   a question asked constantly of a 90-property schema */
+.prop-flag {
+  width: 34px;
+  text-align: right;
+  font-family: ui-monospace, monospace;
+  font-size: 9.5px;
+  color: var(--muted-2);
+}
+
+.prop-flag.is-req {
+  color: var(--danger);
+}
+
+.prop-flag.is-null {
+  color: var(--warn);
+}
+
+.prop-table .chip {
+  min-width: 62px;
+  text-align: center;
+  padding: 0 5px;
+}
+
+/* the literal keyword view is honest but noisy: available, not first */
+.raw-kw {
+  margin-top: 14px;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+}
+
+.raw-kw > summary {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 9px;
+  cursor: pointer;
+  color: var(--muted);
+  list-style: none;
+}
+
+.raw-kw > summary::-webkit-details-marker {
+  display: none;
+}
+
+.raw-kw > summary:hover {
+  color: var(--text);
+}
+
+.raw-kw > summary::before {
+  content: '▸';
+  font-size: 9px;
+  color: var(--muted-2);
+}
+
+.raw-kw[open] > summary::before {
+  content: '▾';
+}
+
+.raw-kw-body {
+  padding: 0 9px 8px;
+}
+
+.detail-section h3 {
+  margin: 12px 0 4px;
+  font-family: ui-monospace, monospace;
+  font-size: 9.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+
+.enum-list {
+  margin: 4px 0;
+  padding-left: 18px;
+}
+
+.enum-list li {
+  margin: 2px 0;
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 10px 0;
+}
+
+.badge {
+  font-family: ui-monospace, monospace;
+  font-size: 10px;
+  background: var(--chip-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 6px;
+}
+
+.badge-req {
+  color: var(--danger);
+  background: var(--danger-bg);
+  border-color: var(--danger-border);
+}
+
+.badge-ref {
+  border-style: dashed;
+  border-color: var(--accent-border);
+}
+
+.detail-comment {
+  color: var(--muted);
+  font-style: italic;
+}
+
+.link-btn {
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--accent);
+  font-size: inherit;
+  text-decoration: underline;
+}
+
+/* literal keyword rows (raw disclosure + field drawer) */
+.kv-list {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 3px 12px;
+  margin: 8px 0;
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.kv-key {
+  color: var(--muted-2);
+}
+
+.kv-val {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+
+.kv-string {
+  color: var(--syn-string);
+}
+
+.kv-number {
+  color: var(--syn-number);
+}
+
+.kv-bool,
+.kv-json {
+  color: var(--syn-const);
+}
+
+.kv-sum {
+  color: var(--muted);
+}
+
+/* the field drawer: its own surface, pinned under the body, so entity context
+   and field detail are legible at the same time */
+.field-drawer {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  max-height: 340px;
+  background: var(--panel-sunk);
+  border-top: 1px solid var(--border);
+}
+
+.drawer-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px 0;
+}
+
+.drawer-body {
+  overflow-y: auto;
+  padding: 5px 14px 14px;
+}
+
+.drawer-body .subject-head h2 {
+  font-size: 15px;
+  font-family: ui-monospace, monospace;
+}
+
+.drawer-body .path-field {
+  background: var(--bg);
+  font-size: 10.5px;
+}
+
+.drawer-body .desc {
+  margin: 11px 0 0;
+}
+
+/* ── footer validation ─────────────────────────────────────────────────────
+   Collapsed by default, but the strip carries the whole verdict; opening it
+   is for finding *where*, not *whether*. */
+
+.footer-panel {
+  position: relative;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--panel);
+  height: 240px;
+}
+
+.footer-panel.collapsed {
+  height: 32px;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+}
+
+.footer-strip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 11.5px;
+}
+
+.v-verdict {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.v-verdict-label {
+  font-family: ui-monospace, monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-2);
+}
+
+.v-divider {
+  width: 1px;
+  height: 14px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+.footer-panel .panel-bar {
+  padding: 0 12px;
+}
+
+.v-body {
+  flex: 1;
+  overflow: auto;
+  padding: 6px 12px 12px;
+  font-size: 12px;
+}
+
+.v-scope {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted-2);
+  font-family: ui-monospace, monospace;
+  font-size: 10.5px;
+}
+
+/* a section name goes in this button, and def names run long */
+.v-scope-name {
+  max-width: 36ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.v-group {
+  margin-top: 8px;
+}
+
+.v-group-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  padding: 2px 0;
+  cursor: help;
+}
+
+.v-group-label {
+  font-family: ui-monospace, monospace;
+  font-size: 9.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+
+.v-pass {
+  color: var(--ok);
+  font-size: 11px;
+}
+
+.v-skip {
+  color: var(--muted-2);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 11px;
+}
+
+.v-counts {
+  display: flex;
+  gap: 4px;
+}
+
+.v-badge {
+  font-family: ui-monospace, monospace;
+  font-size: 10px;
+  border-radius: 8px;
+  padding: 0 6px;
+  line-height: 15px;
+}
+
+.v-badge.v-error {
+  color: var(--danger);
+  background: var(--danger-bg);
+  border: 1px solid var(--danger-border);
+}
+
+.v-badge.v-warn {
+  color: var(--warn);
+  background: var(--warn-bg);
+  border: 1px solid var(--warn-border);
+}
+
+.v-badge.v-info {
+  color: var(--accent);
+  background: var(--accent-bg);
+  border: 1px solid var(--accent-border);
+}
+
+.v-rule {
+  margin-left: 4px;
+}
+
+.v-rule-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+.v-rule-head:hover {
+  background: var(--hover);
+}
+
+.v-sev {
+  width: 14px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.v-sev.v-error {
+  color: var(--danger);
+}
+
+.v-sev.v-warn {
+  color: var(--warn);
+}
+
+.v-sev.v-info {
+  color: var(--accent);
+}
+
+.v-rule-title {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.v-count {
+  font-family: ui-monospace, monospace;
+  font-size: 10px;
+  color: var(--muted);
+  background: var(--chip-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0 6px;
+}
+
+.v-caret {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.v-findings {
+  margin: 2px 0 6px 24px;
+}
+
+.v-hint {
+  color: var(--muted-2);
+  font-style: italic;
+  margin-bottom: 3px;
+}
+
+.v-finding {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  width: 100%;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+.v-finding:hover {
+  background: var(--hover);
+}
+
+.v-path {
+  font-family: ui-monospace, monospace;
+  font-size: 10px;
+  color: var(--accent);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 60%;
+  flex-shrink: 0;
+}
+
+.v-note {
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.v-more {
+  color: var(--muted-2);
+  font-style: italic;
+  padding: 1px 4px;
+}
+
+/* ---------- junction pills (tagged unions) ---------- */
+
+/* the choice itself, not a shape: a compact pill between the owning row and
+   its variant targets. Width/height must match layout.ts JUNCTION_* so the
+/* A choice card: rows are branches, exactly one of which applies. It must not
+   read as an object with fields, so the header carries the fork glyph, a
+   `1 of N` chip and its own tint, and the rows are tagged, not typed. */
+.entity-junction .entity-header {
+  background: var(--head-choice);
+}
+
+.entity-junction .entity-kind {
+  color: var(--accent);
+}
+
+.chip-choice {
+  color: var(--accent);
+  background: var(--accent-bg);
+  border-color: var(--accent-border);
+  border-style: dashed;
+}
+
+.entity-junction.selected /* variant selector in the detail panel */
+.variant-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 6px 0 10px;
+}
+
+.variant-row {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 7px 9px;
+  text-align: left;
+  background: var(--chip-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+}
+
+.variant-row:hover {
+  border-color: var(--accent-border);
+}
+
+.variant-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.variant-via {
+  font-family: ui-monospace, monospace;
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.variant-desc {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.45;
+}

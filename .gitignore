@@ -1,0 +1,18 @@
+node_modules/
+dist/
+schemas/
+
+# Kept on disk, out of the repo: notes tied to the private data model this tool
+# was first built against. Listed file by file rather than by pattern, so a new
+# roadmap item is tracked by default and only an explicit addition here is not.
+lift.py
+CLAUDE.md
+roadmap/completed/feature-def-navigation.md
+roadmap/completed/feature-ref-affordance.md
+roadmap/completed/feature-ref-support.md
+roadmap/completed/feature-schema-walker.md
+roadmap/completed/feature-tagged-unions.md
+roadmap/completed/feature-validation-panel.md
+roadmap/proposed/campaign-refactor-dialect.md
+roadmap/proposed/feature-constraint-chips.md
+roadmap/proposed/feature-provider-lens.md
