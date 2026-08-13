@@ -21,18 +21,26 @@ npm install
 npm run dev            # the port is in the Vite output — it is not always 5173
 ```
 
-Schemas come from two places:
+Schemas come from three places, and the picker groups them that way:
 
 - **`schemas/`** — local files, listed by a dev-server middleware. Gitignored, so it starts empty; drop any `.json` schema in and it appears in the picker. Card positions and depth settings are written back to `<name>.layout.json` next to it.
-- **[`public/remote-schema-urls.json`](public/remote-schema-urls.json)** — a committed `{ "name": "url" }` map, fetched by the browser. Add an entry and the schema shows up under **remote** in the picker, read from the URL every time rather than from a copy that went stale.
+- **[`public/remote-schema-urls.json`](public/remote-schema-urls.json)** — a committed `{ "name": "url" }` map, fetched by the browser. Add an entry and the schema shows up under **remote**, read from the URL every time rather than from a copy that went stale.
 
-```json
-{ "mnx": "https://raw.githubusercontent.com/w3c-cg/mnx/main/docs/mnx-schema.json" }
-```
+  ```json
+  { "mnx": "https://raw.githubusercontent.com/w3c-cg/mnx/main/docs/mnx-schema.json" }
+  ```
 
-A GitHub blob URL works too — it's rewritten to its raw form. The limit is CORS: the host has to send `access-control-allow-origin`, which anything raw-served from a public GitHub repo does.
+- **Any URL, on the spot** — paste one into the box at the foot of the picker, or put it on the query string:
 
-The deployed build has no backend, so `schemas/` doesn't exist there and the demo runs on remote entries alone.
+  ```
+  https://owennewo.github.io/json-schema-exploded/?remote=https://raw.githubusercontent.com/w3c-cg/mnx/main/docs/mnx-schema.json
+  ```
+
+  The address bar follows the selection, so what you copy out of the browser is a link to the schema you are looking at. Ones you open are remembered in that browser and listed under **from url**.
+
+A GitHub blob URL works anywhere a raw one does — it's rewritten. The limit is CORS: the host has to send `access-control-allow-origin`, which anything raw-served from a public GitHub repo does.
+
+The deployed build has no backend, so `schemas/` doesn't exist there and the demo runs on URLs alone.
 
 ## Checks
 

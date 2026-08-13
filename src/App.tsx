@@ -25,9 +25,22 @@ import { Header } from './Header';
 import { useExplodedStore, DEFAULT_DEPTH } from './store';
 import { useValidation } from './useValidation';
 import { depthToJson, loadLayout, saveLayout, type LayoutFile } from './layoutFile';
-import { patchSchemaSession, patchSession, readSchemaSession, readSession } from './session';
+import {
+  patchSchemaSession,
+  patchSession,
+  readSchemaSession,
+  readSession,
+  rememberRemoteUrl,
+} from './session';
 import { applyResolved, onSystemThemeChange } from './theme';
-import { fetchSchemaText, loadSources, type SchemaSource } from './sources';
+import {
+  adhocSources,
+  fetchSchemaText,
+  loadSources,
+  normalizeUrl,
+  REMOTE_PARAM,
+  type SchemaSource,
+} from './sources';
 
 const nodeTypes = { entity: EntityNode };
 const DEFAULT_SCHEMA = 'ifa-factscribe.schema.json';
@@ -154,18 +167,63 @@ export default function App() {
   }, [schemaName]);
 
   useEffect(() => {
-    loadSources().then(({ sources, warnings }) => {
+    loadSources().then(({ sources: listed, warnings }) => {
+      // `?remote=` is a link to a particular schema, so it opens that schema:
+      // it goes to the front of the remembered list and wins the selection.
+      const param = new URLSearchParams(window.location.search).get(REMOTE_PARAM);
+      const opened = param?.trim() ? normalizeUrl(param.trim()) : undefined;
+      const remembered = opened ? rememberRemoteUrl(opened) : readSession().remoteUrls;
+      const adhoc = adhocSources(remembered, listed);
+      const sources = [...listed, ...adhoc];
+
       setSources(sources);
       setSourceWarnings(warnings);
       if (!sources.length) return;
+      const names = sources.map((s) => s.name);
+      const fromParam = opened && adhoc.find((s) => s.url === opened)?.name;
       // the restored schema may have been renamed, deleted, or dropped from
       // the URL map since — fall back to the default, then to whatever exists
-      const names = sources.map((s) => s.name);
       setSchemaName((cur) =>
-        names.includes(cur) ? cur : names.includes(DEFAULT_SCHEMA) ? DEFAULT_SCHEMA : names[0],
+        fromParam ??
+        (names.includes(cur) ? cur : names.includes(DEFAULT_SCHEMA) ? DEFAULT_SCHEMA : names[0]),
       );
     });
   }, []);
+
+  /**
+   * Open a URL nobody listed. Remembered for next time, selected now, and —
+   * via the effect below — written onto the address bar, so the schema you are
+   * looking at is the thing a copied link opens.
+   */
+  const openRemoteUrl = useCallback((raw: string) => {
+    const url = normalizeUrl(raw.trim());
+    if (!url) return;
+    setSources((cur) => {
+      const listed = (cur ?? []).filter((s) => !s.adhoc);
+      const next = [...listed, ...adhocSources(rememberRemoteUrl(url), listed)];
+      const opened = next.find((s) => s.url === url);
+      if (opened) setSchemaName(opened.name);
+      return next;
+    });
+  }, []);
+
+  // Keep `?remote=` in step with the selection: present while an ad-hoc schema
+  // is showing, gone once a listed one is.
+  //
+  // Not before the sources are known. This effect runs on the first render
+  // too, when `sources` is still undefined and nothing can match — which
+  // deleted the incoming `?remote=` from the address bar before the loader
+  // above had a chance to read it, and a deep link opened the default schema.
+  useEffect(() => {
+    if (!sources) return;
+    const source = sources.find((s) => s.name === schemaName);
+    const url = new URL(window.location.href);
+    if (source?.adhoc && source.url) url.searchParams.set(REMOTE_PARAM, source.url);
+    else url.searchParams.delete(REMOTE_PARAM);
+    const next = `${url.pathname}${url.search}${url.hash}`;
+    const now = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+    if (next !== now) window.history.replaceState(null, '', next);
+  }, [sources, schemaName]);
 
   // load schema + layout file
   useEffect(() => {
@@ -675,6 +733,7 @@ export default function App() {
         sourceWarnings={sourceWarnings}
         schemaName={schemaName}
         onSchemaChange={setSchemaName}
+        onOpenUrl={openRemoteUrl}
         driftWarnings={driftWarnings}
         error={error}
         result={result}

@@ -172,24 +172,34 @@ function crumbsFor(result: WalkResult | undefined, selectedId: string | undefine
 }
 
 /**
- * The schema picker's contents: files in `schemas/` first, then the URLs from
- * `remote-schema-urls.json` under their own heading. A remote entry names the
- * host it reads from, because "mnx" alone does not tell you that opening it
- * goes to the network and gets whatever upstream says today.
+ * The schema picker's contents, in three groups: files in `schemas/`, the URLs
+ * listed in `remote-schema-urls.json`, and the ones typed into the box at the
+ * bottom (or arrived on `?remote=`). A URL-backed entry names the host it
+ * reads from, because "mnx" alone does not tell you that opening it goes to
+ * the network and gets whatever upstream says today.
  */
 function SchemaList({
   sources,
   warnings,
   schemaName,
   onPick,
+  onOpenUrl,
 }: {
   sources: SchemaSource[];
   warnings: string[];
   schemaName: string;
   onPick: (name: string) => void;
+  onOpenUrl: (url: string) => void;
 }) {
+  const [draft, setDraft] = useState('');
   const local = sources.filter((s) => s.url === undefined);
-  const remote = sources.filter((s) => s.url !== undefined);
+  const listed = sources.filter((s) => s.url !== undefined && !s.adhoc);
+  const adhoc = sources.filter((s) => s.adhoc);
+  const group = (label: string, hint?: string, title?: string) => (
+    <span className="pop-group label" title={title}>
+      {label} {hint && <span className="label-quiet">· {hint}</span>}
+    </span>
+  );
   const item = (s: SchemaSource) => (
     <button
       key={s.name}
@@ -206,20 +216,43 @@ function SchemaList({
   );
   return (
     <div className="pop-list">
-      {local.length > 0 && remote.length > 0 && <span className="pop-group label">local</span>}
+      {local.length > 0 && sources.length > local.length && group('local')}
       {local.map(item)}
-      {remote.length > 0 && (
-        <span className="pop-group label" title={`listed in ${URL_MAP}`}>
-          remote {local.length === 0 && <span className="label-quiet">· fetched live</span>}
-        </span>
-      )}
-      {remote.map(item)}
+      {listed.length > 0 && group('remote', 'fetched live', `listed in ${URL_MAP}`)}
+      {listed.map(item)}
+      {adhoc.length > 0 && group('from url', 'this browser')}
+      {adhoc.map(item)}
       {sources.length === 0 && <span className="pop-empty">no schema found</span>}
       {warnings.map((w) => (
         <span className="pop-warn" key={w}>
           ⚠ {w}
         </span>
       ))}
+      <form
+        className="pop-url"
+        onSubmit={(ev) => {
+          ev.preventDefault();
+          if (!draft.trim()) return;
+          onOpenUrl(draft);
+          setDraft('');
+        }}
+      >
+        <input
+          className="pop-url-input"
+          value={draft}
+          onChange={(ev) => setDraft(ev.target.value)}
+          placeholder="https://…/schema.json"
+          aria-label="open a schema by URL"
+          spellCheck={false}
+        />
+        <button className="pop-url-go" type="submit" disabled={!draft.trim()}>
+          open
+        </button>
+      </form>
+      <span className="pop-hint">
+        Any URL the host lets this page read (CORS). A GitHub blob link is
+        rewritten to its raw file.
+      </span>
     </div>
   );
 }
@@ -229,6 +262,7 @@ export function Header({
   sourceWarnings,
   schemaName,
   onSchemaChange,
+  onOpenUrl,
   driftWarnings,
   error,
   result,
@@ -239,6 +273,7 @@ export function Header({
   sourceWarnings: string[];
   schemaName: string;
   onSchemaChange: (name: string) => void;
+  onOpenUrl: (url: string) => void;
   driftWarnings: string[];
   error?: string;
   result?: WalkResult;
@@ -283,6 +318,10 @@ export function Header({
             schemaName={schemaName}
             onPick={(name) => {
               onSchemaChange(name);
+              close();
+            }}
+            onOpenUrl={(url) => {
+              onOpenUrl(url);
               close();
             }}
           />

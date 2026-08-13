@@ -32,7 +32,16 @@ export interface SchemaSource {
   name: string;
   /** absent = a file in `schemas/` */
   url?: string;
+  /** typed into the picker or arrived on the query string, rather than listed */
+  adhoc?: boolean;
 }
+
+/**
+ * `?remote=<url>` opens a schema nobody listed. It is set on the address bar
+ * whenever an ad-hoc schema is showing, so the thing you copy out of the
+ * browser is a link to what you are looking at rather than to the app.
+ */
+export const REMOTE_PARAM = 'remote';
 
 export interface SourceList {
   sources: SchemaSource[];
@@ -49,6 +58,46 @@ export function normalizeUrl(url: string): string {
     /^https:\/\/github\.com\/([^/]+)\/([^/]+)\/blob\/(.+)$/,
     'https://raw.githubusercontent.com/$1/$2/$3',
   );
+}
+
+/** a name for a URL nobody named: its filename, falling back to its host */
+export function nameFromUrl(url: string): string {
+  try {
+    const u = new URL(url);
+    const last = u.pathname.split('/').filter(Boolean).pop();
+    return last ? decodeURIComponent(last) : u.host;
+  } catch {
+    return url;
+  }
+}
+
+/**
+ * Names are identity here — the session, the layout file and the validation
+ * scope all key on them — so two URLs ending in `schema.json` must not collide
+ * into one set of saved positions.
+ */
+export function uniqueName(base: string, taken: ReadonlySet<string>): string {
+  if (!taken.has(base)) return base;
+  for (let n = 2; ; n += 1) {
+    const candidate = `${base} (${n})`;
+    if (!taken.has(candidate)) return candidate;
+  }
+}
+
+/** turn a list of bare URLs into named sources that clash with nothing */
+export function adhocSources(urls: readonly string[], existing: readonly SchemaSource[]): SchemaSource[] {
+  const taken = new Set(existing.map((s) => s.name));
+  const seen = new Set<string>();
+  const out: SchemaSource[] = [];
+  for (const raw of urls) {
+    const url = normalizeUrl(raw.trim());
+    if (!url || seen.has(url)) continue;
+    seen.add(url);
+    const name = uniqueName(nameFromUrl(url), taken);
+    taken.add(name);
+    out.push({ name, url, adhoc: true });
+  }
+  return out;
 }
 
 /** the host a remote entry reads from, for the picker's second line */

@@ -36,6 +36,13 @@ export interface SchemaSession {
 export interface Session {
   /** last schema that loaded successfully */
   schemaName?: string;
+  /**
+   * Schema URLs typed into the picker or arrived on `?remote=`. Kept so they
+   * survive a reload — an ad-hoc schema is otherwise gone the moment you look
+   * away from it. Newest first, and capped: this is a recent list, not a
+   * library.
+   */
+  remoteUrls: string[];
   leftOpen: boolean;
   rightOpen: boolean;
   bottomOpen: boolean;
@@ -48,6 +55,7 @@ export interface Session {
 }
 
 const DEFAULTS: Session = {
+  remoteUrls: [],
   leftOpen: true,
   rightOpen: true,
   bottomOpen: false,
@@ -56,6 +64,19 @@ const DEFAULTS: Session = {
   jsonMode: 'tree',
   schemas: {},
 };
+
+/** how many ad-hoc URLs the picker remembers */
+export const REMOTE_URL_LIMIT = 10;
+
+/** newest first, no duplicates, oldest dropped past the limit */
+export function rememberRemoteUrl(url: string): string[] {
+  const remoteUrls = [url, ...readSession().remoteUrls.filter((u) => u !== url)].slice(
+    0,
+    REMOTE_URL_LIMIT,
+  );
+  patchSession({ remoteUrls });
+  return remoteUrls;
+}
 
 /** Infinity has no JSON spelling, so "all" is the stored form (as on disk) */
 type DepthJson = number | 'all';
@@ -105,6 +126,9 @@ function decode(text: string): Session {
   const bool = (v: unknown, fallback: boolean) => (typeof v === 'boolean' ? v : fallback);
   return {
     schemaName: typeof raw.schemaName === 'string' ? raw.schemaName : undefined,
+    remoteUrls: Array.isArray(raw.remoteUrls)
+      ? raw.remoteUrls.filter((u): u is string => typeof u === 'string').slice(0, 10)
+      : [],
     leftOpen: bool(raw.leftOpen, DEFAULTS.leftOpen),
     rightOpen: bool(raw.rightOpen, DEFAULTS.rightOpen),
     bottomOpen: bool(raw.bottomOpen, DEFAULTS.bottomOpen),
