@@ -393,28 +393,31 @@ export function Header({
             >
               {copied ? '✓' : '⧉'}
             </button>
-            {/* the same view, as something you can send: which schema, which
-                anchor, focus, and all three depth axes */}
-            <button
-              className="icon-btn"
-              title="copy a link to this view — schema, anchor, focus and depth"
-              onClick={() =>
-                copy(
-                  shareLink({
-                    remote: loaded?.url,
-                    schema: loaded?.url ? undefined : schemaName,
-                    selectedId,
-                    focus,
-                    depth,
-                  }),
-                  setLinked,
-                )
-              }
-            >
-              {linked ? '✓' : <LinkGlyph />}
-            </button>
           </>
         )}
+        {/* The same view, as something you can send: which schema, which
+            anchor, focus, and all three depth axes. Outside the branch above
+            on purpose — the schema at a given depth, with nothing selected, is
+            a view worth sending too, and the button that sends it should not
+            appear only once you have clicked something. */}
+        <button
+          className="icon-btn"
+          title="copy a link to this view — schema, anchor, focus and depth"
+          onClick={() =>
+            copy(
+              shareLink({
+                remote: loaded?.url,
+                schema: loaded?.url ? undefined : schemaName,
+                selectedId,
+                focus,
+                depth,
+              }),
+              setLinked,
+            )
+          }
+        >
+          {linked ? '✓' : <LinkGlyph />}
+        </button>
       </div>
 
       <div className="hz">
