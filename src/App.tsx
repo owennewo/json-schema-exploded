@@ -41,6 +41,14 @@ import {
   REMOTE_PARAM,
   type SchemaSource,
 } from './sources';
+import { clearViewParams, readViewLink, type ViewLink } from './deepLink';
+
+/**
+ * The link this page was opened with, read at import time. Effects rewrite the
+ * address bar, so by the time one runs the parameters may already be gone —
+ * reading them here is the only point at which they are certainly still there.
+ */
+const OPENED_WITH: ViewLink = readViewLink();
 
 const nodeTypes = { entity: EntityNode };
 const DEFAULT_SCHEMA = 'ifa-factscribe.schema.json';
@@ -129,6 +137,7 @@ export default function App() {
   const select = useExplodedStore((s) => s.select);
   const focus = useExplodedStore((s) => s.focus);
   const toggleFocus = useExplodedStore((s) => s.toggleFocus);
+  const setFocus = useExplodedStore((s) => s.setFocus);
   const setVScope = useExplodedStore((s) => s.setVScope);
   const selectedId = useExplodedStore((s) => s.selectedId);
   const resolvedTheme = useExplodedStore((s) => s.resolvedTheme);
@@ -142,6 +151,8 @@ export default function App() {
   const readyRef = useRef(false);
   const lastSavedRef = useRef('');
   const saveTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  // consumed by the first schema load, then dropped — see there
+  const linkRef = useRef<ViewLink | undefined>(OPENED_WITH);
 
   const scheduleSave = useCallback(() => {
     if (!readyRef.current) return;
@@ -168,11 +179,13 @@ export default function App() {
 
   useEffect(() => {
     loadSources().then(({ sources: listed, warnings }) => {
-      // `?remote=` is a link to a particular schema, so it opens that schema:
-      // it goes to the front of the remembered list and wins the selection.
-      const param = new URLSearchParams(window.location.search).get(REMOTE_PARAM);
-      const opened = param?.trim() ? normalizeUrl(param.trim()) : undefined;
-      const remembered = opened ? rememberRemoteUrl(opened) : readSession().remoteUrls;
+      // `?remote=` is a link to a particular schema, so it opens that schema.
+      // If the URL is one the map already lists, that entry opens rather than a
+      // second copy of it under a filename nobody chose.
+      const opened = OPENED_WITH.remote ? normalizeUrl(OPENED_WITH.remote) : undefined;
+      const alreadyListed = opened ? listed.find((s) => s.url === opened) : undefined;
+      const remembered =
+        opened && !alreadyListed ? rememberRemoteUrl(opened) : readSession().remoteUrls;
       const adhoc = adhocSources(remembered, listed);
       const sources = [...listed, ...adhoc];
 
@@ -180,11 +193,15 @@ export default function App() {
       setSourceWarnings(warnings);
       if (!sources.length) return;
       const names = sources.map((s) => s.name);
-      const fromParam = opened && adhoc.find((s) => s.url === opened)?.name;
+      // `?schema=` names a local file, for the one case a URL cannot travel
+      const wanted =
+        alreadyListed?.name ??
+        (opened ? adhoc.find((s) => s.url === opened)?.name : undefined) ??
+        (OPENED_WITH.schema && names.includes(OPENED_WITH.schema) ? OPENED_WITH.schema : undefined);
       // the restored schema may have been renamed, deleted, or dropped from
       // the URL map since — fall back to the default, then to whatever exists
       setSchemaName((cur) =>
-        fromParam ??
+        wanted ??
         (names.includes(cur) ? cur : names.includes(DEFAULT_SCHEMA) ? DEFAULT_SCHEMA : names[0]),
       );
     });
@@ -260,12 +277,19 @@ export default function App() {
         const savedPositions: Record<string, Point> = {};
         for (const [id, p] of Object.entries(saved?.positions ?? {}))
           if (entityIds.has(id)) savedPositions[id] = p;
-        const depthInit = saved?.depth ?? session.depth ?? DEFAULT_DEPTH;
+        // A link describes a view, and it wins over the remembered one — but
+        // only on the load it arrived with, so switching schemas afterwards is
+        // not haunted by the link that opened the app.
+        const link = linkRef.current;
+        linkRef.current = undefined;
+        const linkedId = link?.selectedId && anchorOf(walk, link.selectedId) ? link.selectedId : undefined;
+        const depthInit = link?.depth ?? saved?.depth ?? session.depth ?? DEFAULT_DEPTH;
         // The last session's selection comes back — it is the anchor depth is
         // graded from, so without it the same depth draws a different graph. A
         // stored id that no longer resolves (the schema was edited) is dropped.
-        const restoredAnchor = anchorOf(walk, session.selectedId);
-        const restoredId = restoredAnchor ? session.selectedId : undefined;
+        const wantedId = linkedId ?? session.selectedId;
+        const restoredAnchor = anchorOf(walk, wantedId);
+        const restoredId = restoredAnchor ? wantedId : undefined;
         // the first layout is graded from that anchor, falling back to the
         // entry entity — same fallback the live view uses
         const entry = walk.entities.find((e) => e.isEntry) ?? walk.entities[0];
@@ -312,6 +336,10 @@ export default function App() {
         setSchemaDoc(schema);
         setDriftWarnings(twins.warnings);
         select(restoredId);
+        if (link?.focus !== undefined) setFocus(link.focus);
+        // the view is on screen now, so the parameters that described it have
+        // done their job; leaving them up would only let them go stale
+        if (link) clearViewParams();
         // a stored "per section" scope means nothing to a document with no
         // sections, so that one drops back to the document default. "selected
         // section" survives either way — a $defs entry is a section too.
@@ -339,7 +367,7 @@ export default function App() {
     return () => {
       cancelled = true;
     };
-  }, [schemaName, sources, setSchemaDoc, setSchemaRaw, select, setDepth, setVScope]);
+  }, [schemaName, sources, setSchemaDoc, setSchemaRaw, select, setDepth, setFocus, setVScope]);
 
   // persist depth changes (no-op saves are skipped via lastSavedRef)
   useEffect(() => {

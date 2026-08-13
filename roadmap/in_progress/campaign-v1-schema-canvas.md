@@ -52,6 +52,7 @@ v2
 23. feature-reset-layout.md
 24. feature-remote-schemas.md
 25. feature-schema-by-url.md
+26. feature-view-links.md
 
 ## Decisions resolved
 

@@ -58,6 +58,8 @@ interface ExplodedState {
   toggleRight: () => void;
   toggleBottom: () => void;
   toggleFocus: () => void;
+  /** focus at a known value — a shared link says which, rather than flipping it */
+  setFocus: (focus: boolean) => void;
   setTheme: (theme: Theme) => void;
   /** re-resolve "system" after an OS preference change */
   syncSystemTheme: () => void;
@@ -113,6 +115,10 @@ export const useExplodedStore = create<ExplodedState>((set) => ({
       patchSession({ focus });
       return { focus };
     }),
+  setFocus: (focus) => {
+    patchSession({ focus });
+    set({ focus });
+  },
   setTheme: (theme) => {
     storeTheme(theme);
     set({ theme, resolvedTheme: resolveTheme(theme) });

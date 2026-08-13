@@ -40,6 +40,16 @@ Schemas come from three places, and the picker groups them that way:
 
 A GitHub blob URL works anywhere a raw one does — it's rewritten. The limit is CORS: the host has to send `access-control-allow-origin`, which anything raw-served from a public GitHub repo does.
 
+### Sharing a view
+
+The link icon beside the breadcrumb copies where you are standing, not just which schema you opened — the anchored node, focus mode, and all three depth settings:
+
+```
+?remote=<schema url>&sel=$defs/arpeggio&focus=1&d=3.all.2
+```
+
+Opening it reproduces the picture in a browser that has never seen the app. The parameters are applied once and then cleared from the address bar; your session remembers the view from there.
+
 The deployed build has no backend, so `schemas/` doesn't exist there and the demo runs on URLs alone.
 
 ## Checks
