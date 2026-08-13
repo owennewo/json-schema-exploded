@@ -1,0 +1,60 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# The deploy job needs to mint an OIDC token for the Pages deployment, and
+# write to the Pages environment; nothing here needs write access to the repo.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deploy at a time. Queued rather than cancelled: a run that is already
+# uploading should finish, so the site is never left mid-swap.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # the walker check runs off the committed fixtures, so it needs nothing
+      # that is not in the repo — worth failing the deploy over
+      - run: npm run check:walker
+
+      # `npm run build` is `tsc --noEmit && vite build`; vite.config sets
+      # base: './' so the output runs from the /<repo>/ path Pages serves it at
+      - run: npm run build
+
+      # enablement turns Pages on for the repo if it is not already, so a fresh
+      # clone deploys without a visit to the settings page first
+      - uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
