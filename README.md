@@ -42,7 +42,7 @@ A GitHub blob URL works anywhere a raw one does — it's rewritten. The limit is
 
 ### Sharing a view
 
-The link icon beside the breadcrumb copies where you are standing, not just which schema you opened — the anchored node, focus mode, and all three depth settings:
+The link icon beside the breadcrumb copies where you are standing, not just which schema you opened — the anchored node, focus mode, and all three depth settings. Every card header carries one too, which points at that card whether or not it is selected:
 
 ```
 ?remote=<schema url>&sel=$defs/arpeggio&focus=1&d=3.all.2

@@ -133,6 +133,7 @@ export default function App() {
   const [snap, setSnap] = useState(() => readSession().snap);
 
   const setSchemaDoc = useExplodedStore((s) => s.setSchemaDoc);
+  const setSchemaSource = useExplodedStore((s) => s.setSchemaSource);
   const setSchemaRaw = useExplodedStore((s) => s.setSchemaRaw);
   const select = useExplodedStore((s) => s.select);
   const focus = useExplodedStore((s) => s.focus);
@@ -334,6 +335,9 @@ export default function App() {
         setDepth(depthInit);
         setResult(walk);
         setSchemaDoc(schema);
+        // a share link has to name where this came from, and the card buttons
+        // that build one have no other route to it
+        setSchemaSource(source);
         setDriftWarnings(twins.warnings);
         select(restoredId);
         if (link?.focus !== undefined) setFocus(link.focus);
@@ -367,7 +371,17 @@ export default function App() {
     return () => {
       cancelled = true;
     };
-  }, [schemaName, sources, setSchemaDoc, setSchemaRaw, select, setDepth, setFocus, setVScope]);
+  }, [
+    schemaName,
+    sources,
+    setSchemaDoc,
+    setSchemaSource,
+    setSchemaRaw,
+    select,
+    setDepth,
+    setFocus,
+    setVScope,
+  ]);
 
   // persist depth changes (no-op saves are skipped via lastSavedRef)
   useEffect(() => {

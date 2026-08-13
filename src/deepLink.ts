@@ -11,7 +11,7 @@
  * schema, so a reload keeps the view; leaving the parameters up would only
  * mean the URL describes a view you have since clicked away from.
  */
-import type { DepthSettings } from './store';
+import { useExplodedStore, type DepthSettings } from './store';
 import { REMOTE_PARAM } from './sources';
 
 /** a local or listed schema, by the name the picker shows */
@@ -74,6 +74,26 @@ export function shareLink(view: ViewLink): string {
   if (view.focus) p.set('focus', '1');
   if (view.depth) p.set('d', `${stepOut(view.depth.scalar)}.${stepOut(view.depth.object)}.${stepOut(view.depth.edges)}`);
   return url.toString();
+}
+
+/**
+ * The view as it stands, right now, optionally anchored somewhere other than
+ * the current selection — which is what a per-card button wants.
+ *
+ * Reads the store at call time rather than subscribing to it. A hook would put
+ * every card that renders one of these buttons on the selection, focus and
+ * depth subscriptions, so clicking a single card would re-render all eighty of
+ * them. Nothing here is needed until the button is pressed.
+ */
+export function shareLinkNow(anchorId?: string): string {
+  const s = useExplodedStore.getState();
+  return shareLink({
+    remote: s.schemaSource?.url,
+    schema: s.schemaSource?.url ? undefined : s.schemaSource?.name,
+    selectedId: anchorId ?? s.selectedId,
+    focus: s.focus,
+    depth: s.depth,
+  });
 }
 
 /** drop the view parameters, keeping whatever else is on the address bar */

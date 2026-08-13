@@ -26,6 +26,19 @@ clipboard:
   with no URL to give. It only means anything to someone with the same
   `schemas/` directory, which is why a URL is preferred whenever there is one.
 
+## Two buttons, one link
+
+Beside the breadcrumb, and on every card header. The card's version takes an
+anchor of its own, so it links to that card whether or not it is the selection
+— the smallest useful thing to send someone, and one click rather than three.
+It stops the click from propagating, or pressing it would also select the card
+and quietly make the link mean something else.
+
+The link is built from the store at click time rather than through a hook. A
+hook would subscribe every card to selection, focus and depth, so clicking one
+card would re-render all eighty; none of that state is needed until the button
+is actually pressed.
+
 ## Applied once, then cleared
 
 The parameters are read at import time — effects rewrite the address bar, and

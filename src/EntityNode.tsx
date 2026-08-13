@@ -5,6 +5,7 @@ import type { RowView } from './depth';
 import { nodeHeight } from './layout';
 import { useExplodedStore } from './store';
 import { copySectionSchema } from './copySection';
+import { LinkButton } from './LinkButton';
 import { chipTone } from './chipTone';
 
 export type EntityFlowNode = Node<
@@ -148,6 +149,9 @@ export function EntityNode({ data }: NodeProps<EntityFlowNode>) {
             {copied ? '✓' : '⧉'}
           </button>
         )}
+        {/* every card, not only the sections that can be copied whole: a link
+            to one card is the smallest useful thing to send someone */}
+        <LinkButton className="copy-btn" title="copy a link to this card" anchorId={e.id} />
       </div>
       {(rows.length > 0 || (e.inherits && showLinks)) && (
         <div className="entity-rows">

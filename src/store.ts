@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import type { JsonSchema } from './walker';
+import type { SchemaSource } from './sources';
 import { readStoredTheme, resolveTheme, storeTheme, type Resolved, type Theme } from './theme';
 import { patchSession, readSession } from './session';
 import type { Scope } from './validation';
@@ -29,6 +30,8 @@ interface ExplodedState {
   selectedId: string | undefined;
   /** the raw loaded schema document (source of truth for copy-section) */
   schemaDoc: JsonSchema | undefined;
+  /** where the loaded schema came from — a share link has to name it */
+  schemaSource: SchemaSource | undefined;
   /** the schema file's text as fetched — validation reports syntax errors from it */
   schemaRaw: string | undefined;
   /** side-panel visibility (left = JSON view, right = detail view) */
@@ -53,6 +56,7 @@ interface ExplodedState {
   setVScope: (scope: Scope | undefined) => void;
   setDepth: (patch: Partial<DepthSettings>) => void;
   setSchemaDoc: (doc: JsonSchema | undefined) => void;
+  setSchemaSource: (source: SchemaSource | undefined) => void;
   setSchemaRaw: (raw: string | undefined) => void;
   toggleLeft: () => void;
   toggleRight: () => void;
@@ -74,6 +78,7 @@ const session = readSession();
 export const useExplodedStore = create<ExplodedState>((set) => ({
   selectedId: undefined,
   schemaDoc: undefined,
+  schemaSource: undefined,
   schemaRaw: undefined,
   leftOpen: session.leftOpen,
   rightOpen: session.rightOpen,
@@ -90,6 +95,7 @@ export const useExplodedStore = create<ExplodedState>((set) => ({
   },
   setDepth: (patch) => set((s) => ({ depth: { ...s.depth, ...patch } })),
   setSchemaDoc: (doc) => set({ schemaDoc: doc }),
+  setSchemaSource: (schemaSource) => set({ schemaSource }),
   setSchemaRaw: (raw) => set({ schemaRaw: raw }),
   toggleLeft: () =>
     set((s) => {

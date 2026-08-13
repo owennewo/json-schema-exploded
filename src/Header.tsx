@@ -5,36 +5,10 @@ import { THEME_ORDER, type Theme } from './theme';
 import { Popover } from './Popover';
 import { chipTone } from './chipTone';
 import { hostOf, URL_MAP, type SchemaSource } from './sources';
-import { shareLink } from './deepLink';
+import { copyText, LinkButton } from './LinkButton';
 
 const THEME_GLYPH: Record<Theme, string> = { system: '◐', light: '☀', dark: '☾' };
 
-/**
- * Drawn rather than typed. The chrome's other icons are characters, and they
- * depend on the font having them — which is a bet that comes off for `⧉` and
- * `▾` and not for a chain link, where the coverage is patchy and the fallback
- * is an empty box.
- */
-function LinkGlyph() {
-  return (
-    <svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true" fill="none"
-      stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
-      <path d="M6.6 9.4a3 3 0 0 0 4.3 0l1.9-2a3 3 0 0 0-4.3-4.2l-.7.7" />
-      <path d="M9.4 6.6a3 3 0 0 0-4.3 0l-1.9 2a3 3 0 0 0 4.3 4.2l.7-.7" />
-    </svg>
-  );
-}
-
-/** clipboard write with a ✓ that fades — the clipboard is silent otherwise */
-async function copy(text: string, flag: (on: boolean) => void): Promise<void> {
-  try {
-    await navigator.clipboard.writeText(text);
-    flag(true);
-    setTimeout(() => flag(false), 1200);
-  } catch {
-    /* clipboard unavailable (insecure origin, denied permission) */
-  }
-}
 
 /** how many cards are drawn, and how many are showing a residue chip */
 export interface DepthStats {
@@ -315,9 +289,7 @@ export function Header({
   const toggleBottom = useExplodedStore((s) => s.toggleBottom);
   const crumbs = useMemo(() => crumbsFor(result, selectedId), [result, selectedId]);
   const loaded = sources.find((s) => s.name === schemaName);
-  const depth = useExplodedStore((s) => s.depth);
   const [copied, setCopied] = useState(false);
-  const [linked, setLinked] = useState(false);
   const anchor = crumbs[crumbs.length - 1];
 
   return (
@@ -389,7 +361,7 @@ export function Header({
             <button
               className="icon-btn"
               title="copy schema path"
-              onClick={() => copy(anchor.id, setCopied)}
+              onClick={() => copyText(anchor.id, setCopied)}
             >
               {copied ? '✓' : '⧉'}
             </button>
@@ -400,24 +372,7 @@ export function Header({
             on purpose — the schema at a given depth, with nothing selected, is
             a view worth sending too, and the button that sends it should not
             appear only once you have clicked something. */}
-        <button
-          className="icon-btn"
-          title="copy a link to this view — schema, anchor, focus and depth"
-          onClick={() =>
-            copy(
-              shareLink({
-                remote: loaded?.url,
-                schema: loaded?.url ? undefined : schemaName,
-                selectedId,
-                focus,
-                depth,
-              }),
-              setLinked,
-            )
-          }
-        >
-          {linked ? '✓' : <LinkGlyph />}
-        </button>
+        <LinkButton />
       </div>
 
       <div className="hz">
